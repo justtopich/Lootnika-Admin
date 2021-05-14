@@ -21,6 +21,9 @@
   transform: translateY(-50%);
   -webkit-transform: translateY(-50%);
 }
+.header-menu-item-cnt {
+  padding: 0 .5em 0 .5em;
+}
 .header-menu-item-cnt > a {
   color:#3f4d67;
 }

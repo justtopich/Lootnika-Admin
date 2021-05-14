@@ -1,12 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom'
 import { Layout, Menu, Space, Divider, Button, Tooltip } from 'antd';
-import { githubPage } from '../../config/config'
+import { githubPage, version } from '../../config/config'
 import routes from '../../routes';
 import { ReactComponent as Myico } from '../../assets/myico.svg';
 import { 
   DashboardFilled,
-  MailOutlined,
+  InfoCircleOutlined,
   UnorderedListOutlined,
   GithubFilled,
   MenuUnfoldOutlined,
@@ -35,7 +35,6 @@ export default class BaseLayout extends React.Component {
       <Layout style={{ minHeight: "100vh" }}>
       <Sider
           collapsible
-          // collapsed={this.state.collapsed} onCollapse={() => this.setState({ collapsed: !this.state.collapsed })}
           collapsed={this.state.collapsed}
           trigger={null}>
           <div className="sider-logo" style={{padding: ".3em"}}>
@@ -47,9 +46,9 @@ export default class BaseLayout extends React.Component {
             style={{ borderRight: 0, backgroundColor: "#3f4d67" }}
             theme="dark"
             >
-              <Menu.Item key="1" icon={<DashboardFilled />}><Link to="/">Dashboard</Link></Menu.Item>
-              <Menu.Item key="2" icon={<UnorderedListOutlined />}><Link to="/tasksjournal">Tasks journal</Link></Menu.Item>
-              <Menu.Item key="3" icon={<MailOutlined />}><Link to="/about">About</Link></Menu.Item>
+              <Menu.Item key="1" icon={<DashboardFilled />}><Link to="/admin">Dashboard</Link></Menu.Item>
+              <Menu.Item key="2" icon={<UnorderedListOutlined />}><Link to="/admin/tasksjournal">Tasks journal</Link></Menu.Item>
+              <Menu.Item key="3" icon={<InfoCircleOutlined />}><Link to="/admin/about">About</Link></Menu.Item>
           </Menu>
         </Sider>
         <Layout>
@@ -83,7 +82,7 @@ export default class BaseLayout extends React.Component {
               split={<Divider type="vertical" style={{borderLeft: "0.05rem solid #000"}} />}>
                 <Button type="text" target={"_blank"} href={githubPage + "/lootnika"} size="large" icon={<GithubFilled />} style={{marginRight: "-0.5em"}}>
                 </Button>
-                <div>Lootnika control panel v0.1.0</div>
+                <div>Lootnika control panel {version}</div>
             </Space>
             {/* <div className="footer-menu" style={{float: "right", marginLeft: "auto", marginRight: 0}}>
               <div className="footer-menu-item">
