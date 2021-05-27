@@ -136,7 +136,7 @@ export default class TasksJournal extends React.Component {
       let rowsData = []
 
       for (let row of tasks) {
-        if (fakeStart > this.state.recordStart){
+        if (fakeStart >= this.state.recordStart){
           if (fakeLimit  < this.state.selectSize){
             let a = moment(row["end_time"], 'DD.MM.YYYY HH:mm:ss').valueOf() -
                     moment(row["start_time"],'DD.MM.YYYY HH:mm:ss').valueOf()
@@ -154,7 +154,9 @@ export default class TasksJournal extends React.Component {
           }
           fakeStart += 1
         }
+        fakeStart += 1
       }
+      console.log(rowsData)
       return rowsData
     }
 
@@ -185,7 +187,7 @@ export default class TasksJournal extends React.Component {
       if(demoMode){
           resp = await axiosGetFake(
               'a=schedule?cmd=QueueInfo&start=' + this.state.recordStart + '&limit=' + this.state.selectSize,
-              {status: 200, data: queueinfo}, 1200
+              {status: 200, data: queueinfo}, 600
           );
       }else{
           resp = await axiosGet('a=schedule?cmd=QueueInfo&start=' + this.state.recordStart + '&limit=' + this.state.selectSize);
@@ -221,7 +223,7 @@ export default class TasksJournal extends React.Component {
     async updateSchedule() {
         let resp: Res
         if(demoMode){
-          resp = await axiosGetFake('a=schedule?cmd=QueueInfo&limit=0', {status: 200, data: queueinfo}, 1500);
+          resp = await axiosGetFake('a=schedule?cmd=QueueInfo&limit=0', {status: 200, data: queueinfo}, 200);
         }else{
           resp = await axiosGet('a=schedule?cmd=QueueInfo&limit=0');
         }
@@ -362,7 +364,7 @@ export default class TasksJournal extends React.Component {
         const bType: LooseObject = {
           "pause":
             <Button 
-            className="button-danger"
+            className="button-warn"
             type="primary"
             loading={this.state.startPause.loading}
             disabled={!this.state.startPause.active}
@@ -371,8 +373,7 @@ export default class TasksJournal extends React.Component {
             Pause
             </Button>,
           "start": 
-            <Button 
-            // className="button-danger"
+            <Button
             type="primary"
             loading={this.state.startPause.loading}
             disabled={!this.state.startPause.active}

@@ -102,7 +102,7 @@ export const queueinfo = {
     "count_delete": 11212,
     "count_task_error": 232,
     "count_export_error": 123123123,
-    "last_doc_id": "laval-sr_343"
+    "last_doc_id": "laval-sr_87"
     },
     {
     "id": 540,

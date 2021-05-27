@@ -1,5 +1,5 @@
 import React from "react";
-import { Space, Card, List, Divider } from 'antd';
+import { Space, Card, List } from 'antd';
 import { Props } from '../config/index.type';
 import { version } from '../config/config'
 

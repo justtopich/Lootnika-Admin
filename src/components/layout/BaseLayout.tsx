@@ -63,6 +63,7 @@ export default class BaseLayout extends React.Component {
               <div className="header-menu-item-cnt">
                 <Tooltip placement="bottom" title="Open help page">
                   <Link target={"_blank"} to="/help"><QuestionCircleOutlined /></Link>
+                  {/* <Link target={"_blank"} to="/lootnika/help/index.html"><QuestionCircleOutlined /></Link> */}
                 </Tooltip>
               </div>
             </div>

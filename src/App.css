@@ -106,19 +106,17 @@
 .ant-table-wrapper::before{
   display: none;
 }
-.button-danger {
+.button-warn {
   background-color: orange;
   border-color: orange;
 }
-.button-danger:hover{
-  background-color: orange;
-  border-color: orange;
-  opacity: 70%;
+.button-warn:hover{
+  background-color:#ffcc6f;
+  border-color: #ffcc6f;
 }
-.button-danger:focus{
-  background: orange;
-  border-color: orange;
-  opacity: 70%;
+.button-warn:focus{
+  background: #ffcc6f;
+  border-color: #ffcc6f;
 }
 
 html {
