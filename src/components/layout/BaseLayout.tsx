@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState, useContext } from 'react';
+import { AppContext } from '../../AppProvider';
 import { Link } from 'react-router-dom'
+import routes from '../../routes';
 import { Layout, Menu, Space, Divider, Button, Tooltip } from 'antd';
 import { githubPage, version } from '../../config/config'
-import routes from '../../routes';
 import { ReactComponent as Myico } from '../../assets/myico.svg';
 import { 
   DashboardFilled,
@@ -14,28 +15,19 @@ import {
   QuestionCircleOutlined
 } from '@ant-design/icons';
 
-
 const { Content, Sider, Header, Footer } = Layout;
 
-export default class BaseLayout extends React.Component {
-  state = {
-    collapsed: false,
-    lastUpdate: new Date().toLocaleTimeString()
-  };
+export default function BaseLayout() {
 
-  toggle = () => {
-    this.setState({
-      collapsed: !this.state.collapsed,
-    });
-  };
+  const [collapsed, setСollapsed] = useState(false);
+  let { lastUpdate } = useContext(AppContext);
 
-  render() {
     return (
       <>
       <Layout style={{ minHeight: "100vh" }}>
       <Sider
           collapsible
-          collapsed={this.state.collapsed}
+          collapsed={collapsed}
           trigger={null}>
           <div className="sider-logo" style={{padding: ".3em"}}>
             <Myico style={{display: "block", height: "3.4em", width: "3.4em", margin: "0 auto" }}/>
@@ -53,9 +45,9 @@ export default class BaseLayout extends React.Component {
         </Sider>
         <Layout>
           <Header>
-          {React.createElement(this.state.collapsed ? MenuUnfoldOutlined : MenuFoldOutlined, {
+          {React.createElement(collapsed ? MenuUnfoldOutlined : MenuFoldOutlined, {
               className: 'trigger',
-              onClick: this.toggle,
+              onClick: () => setСollapsed(!collapsed),
               id: "components-layout-demo-custom-trigger"
           })}
           <div className="heder-menu" style={{float: "right", marginLeft: "auto", marginRight: 0}}>
@@ -73,7 +65,7 @@ export default class BaseLayout extends React.Component {
           <Content id="content">
             {routes()}
             <div id="lastUpdate">
-              <span>Last update: {this.state.lastUpdate}</span>
+              <span>Last update: {lastUpdate}</span>
             </div>
           </Content>
           <Footer style={{ textAlign: 'center', color: "#000" }}>
@@ -98,5 +90,3 @@ export default class BaseLayout extends React.Component {
       </>
     )
   }
-}
-

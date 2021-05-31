@@ -3,8 +3,8 @@ import { Space, Card, List } from 'antd';
 import { Props } from '../config/index.type';
 import { version } from '../config/config'
 
-export default function About(props: Props) {
 
+export default function About(props: Props) {
   const dependencies = {
     "@loadable/component": "^5.14.1",
     "@testing-library/jest-dom": "^5.11.4",

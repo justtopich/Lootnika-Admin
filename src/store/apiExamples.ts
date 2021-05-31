@@ -1,14 +1,28 @@
-export const getstatus = {
+export const getinfo = {
     "status": "ok",
     "message": "",
     "product": "Lootnika data collector",
-    "picker_type": "lootnika_mysql",
-    "version": "0.7.0-dev.0",
-    "uptime": "3:46:58",
-    "service_name": "Lootnika-Svc",
+    "picker_type": "lootnika_pyodbc",
+    "version": "1.1.2-beta.0",
+    "service_name": "Lootnika-svc",
     "directory": "D:\\app\\lootnika\\",
     "client_host": "127.0.0.1",
-    "client_role": "admin"
+    "client_role": "admin",
+    "pid": 10680,
+    "pid_owner": "ETL-2\\megumin"
+}
+
+export const getstatus = {
+    "status": "ok",
+    "message": "",
+    "uptime": "1:14:15",
+    "cpu": 36.3,
+    "ram_total": 6154336768,
+    "ram_available": 2288584192,
+    "ram_percent": 62.81,
+    "ram_used": 3865752576,
+    "ram_free": 2288584192,
+    "ram_lootnika_percent": 2.4
 }
 
 export const stop = {

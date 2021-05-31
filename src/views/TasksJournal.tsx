@@ -156,7 +156,7 @@ export default class TasksJournal extends React.Component {
         }
         fakeStart += 1
       }
-      console.log(rowsData)
+      // console.log(rowsData)
       return rowsData
     }
 

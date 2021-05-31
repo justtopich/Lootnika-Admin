@@ -14,3 +14,7 @@ export type Res =
       message?: string;
     }
   | undefined;
+
+export interface LooseObject {
+    [key: string]: any
+}

@@ -1,8 +1,8 @@
-import React from 'react';
-import { CacheRoute, CacheSwitch, } from 'react-router-cache-route';
+import React from "react";
+import { CacheRoute, CacheSwitch } from 'react-router-cache-route';
 import loadable from "@loadable/component";
 import Loading from "../components/Loading";
-import { Redirect } from 'react-router-dom';
+import { Redirect } from "react-router-dom";
 
 
 const [NotFound, Dashboard, TasksJournal, About] = [
@@ -16,7 +16,7 @@ const [NotFound, Dashboard, TasksJournal, About] = [
     });
   });
 
-export function routes() {
+  export function routes() {
     return (
         <CacheSwitch>
             <CacheRoute exact path="/"  ><Redirect to="/admin" /></CacheRoute>
