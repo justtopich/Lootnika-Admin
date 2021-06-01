@@ -6,7 +6,9 @@ import { version } from '../config/config'
 
 export default function About(props: Props) {
   const dependencies = {
+    "@ant-design/charts": "^1.1.4",
     "@loadable/component": "^5.14.1",
+    "@reach/router": "^1.3.4",
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
@@ -18,13 +20,13 @@ export default function About(props: Props) {
     "@types/react-router-dom": "^5.1.7",
     "antd": "^4.15.4",
     "axios": "^0.21.1",
+    "pretty-bytes": "^5.6.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
-    "react-redux": "^7.2.4",
     "react-router-cache-route": "^1.11.0",
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.3",
-    "redux": "^4.1.0",
+    "react-use": "^17.2.4",
     "typescript": "^4.1.2",
     "web-vitals": "^1.0.1"
   }

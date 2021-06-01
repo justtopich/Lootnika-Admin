@@ -22,12 +22,8 @@ import { axiosGetFake, axiosGet } from '../utils/public';
 import { queueinfo, stop } from '../store/apiExamples';
 import moment from 'moment';
 import { demoMode } from '../config/config'
-import { Res } from '../config/index.type';
+import { Res, LooseObject } from '../config/index.type';
 
-
-interface LooseObject {
-    [key: string]: any
-  }
 
 function timeConversion(duration: number) {
     const portions: string[] = [];

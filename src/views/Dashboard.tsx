@@ -1,49 +1,32 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext } from "react";
 import { AppContext } from '../AppProvider';
 import { Space, Card, List, message, Tooltip } from 'antd';
 import { axiosGetFake, axiosGet, useInterval } from '../utils/public';
 import { Res, Props, LooseObject } from '../config/index.type';
-import { getstatus, getinfo, queueinfo } from '../store/apiExamples';
+import { getinfo, queueinfo } from '../store/apiExamples';
 import { demoMode } from '../config/config';
 import { Bar } from '@ant-design/charts';
-import prettyBytes from 'pretty-bytes';
-import { 
-  WarningOutlined,
-  ExclamationCircleOutlined,
+import {
+  WarningFilled,
+  ExclamationCircleFilled,
   }
 from '@ant-design/icons';
 
 
-type TaskItem = {
-  name: string;
-  task_error: string;
-  export_error: string;
-};
-
-
 export default function Dashboard(props: Props) {
-  let { refresh } = useContext(AppContext);
+  let { cardStatusLoading, cardStatus, statusBarConfig } = useContext(AppContext);
+  let tasksItems: Array<Array<string>> = Object.entries(cardStatus[0])
 
-  let [delay, setDelay] = useState([200]);
-  const [inited, set_inited] = useState([false]);
-
+  let delay = useState(3000)[0];
+  const isPlaying = useState([true])[0]
   const [cardInfoLoading, set_cardInfoLoading] = useState(true);
-  const [cardStatusLoading, set_cardStatusLoading] = useState(true);
   const [cardTasksLoading, set_cardTasksLoading] = useState(true);
 
-  const [getStatusPending, set_getStatusPending] = useState([false]);
-  const [getInfoPending, set_getInfoPending] = useState([false]);
-  const [getTasksPending, set_getTasksPending] = useState([false]);
+  const getInfoPending = useState([false])[0];
+  const getTasksPending = useState([false])[0];
   
   const [cardAccess, set_cardAccess] = useState({client_host: '', client_role: ''});
-  const [cardStatus, set_cardStatus] = useState({
-    status: '', uptime: '', cpu: '',
-    ram_total: '',
-    ram_available: '',
-    ram_used: '',
-    ram_free: '',
-    ram_lootnika: '',
-  });
+
   const [cardInfo, set_cardInfo] = useState(
     {
       product: '',
@@ -55,59 +38,14 @@ export default function Dashboard(props: Props) {
       pid_owner: '',
     },
   );
-  const [cardTasks, set_cardTasks] = useState([[{
+  const cardTasks = useState([[{
     name: '',
     start_time: '',
     task_error: '',
     export_error: '',
     color1: '',
     color2: '',
-  }]])
-
-  var config: any = {
-    data: [{
-      kind: 'Total',
-      size: '',
-      value: 0,
-    }],
-    xField: 'value',
-    yField: 'line',
-    seriesField: 'kind',
-    isPercent: true,
-    isStack: true,
-    legend: false,
-    height: 50,
-    // color: ['#f7c122', '#9a67bd', '#657798'],
-    label: {
-      position: 'end',
-
-      content: function content(item: LooseObject) {
-        return item.value.toFixed(2);
-      },
-      style: { fill: '#fff' },
-    },
-    animation: {
-      appear: {
-        animation: 'zoom-in',
-        duration: 500,
-      },
-      update: {
-        animation: 'position-update',
-        duration: 200,
-      },
-      enter: {
-        animation: 'zoom-in',
-        duration: 0,
-      },
-      leave: {
-        animation: 'zoom-out',
-        duration: 0,
-      },
-    },
-    barWidthRatio: 1
-  };
-  
-  const [barConfig, set_barConfig] = useState(config);
+  }]])[0]
 
   async function makeStateFromKeys(stateObj: {}, obj: LooseObject) {
     let m:LooseObject = {};
@@ -118,10 +56,11 @@ export default function Dashboard(props: Props) {
     return m
   };
  
-  async function updateInfo() {
+  async function updateInfo(): Promise<Boolean> {
     // console.log('updateInfo')
+    let done = false;
     if (getInfoPending[0]){
-      return
+      return false
     }
 
     getInfoPending[0] = true;
@@ -133,82 +72,19 @@ export default function Dashboard(props: Props) {
     }
 
     if (resp){
-      let a: any = await makeStateFromKeys(cardInfo, resp?.data)
-      set_cardStatus(a)
-      refresh()
-      
+      let a: any = await makeStateFromKeys(cardInfo, resp?.data)      
       if (cardInfoLoading){
         a = await makeStateFromKeys(cardAccess, resp?.data)
         set_cardAccess(a)
         a = await makeStateFromKeys(cardInfo, resp?.data)
         set_cardInfo(a)
         set_cardInfoLoading(false);
+        done = true;
       }
     }
     getInfoPending[0] = false;
-  }
-
-  async function updateStatus() {
-    // console.log('updateStatus')
-    if (getStatusPending[0]){
-      return
-    }
-
-    getStatusPending[0] = true;
-    let resp: Res
-    if(demoMode){
-      let dt = new Date()
-      getstatus.uptime = "24 day " + dt.getHours() + ":" + dt.getMinutes() + ":" + dt.getSeconds()
-      resp = await axiosGetFake('a=getstatus', {status: 200, data: getstatus}, 600);
-    }else{
-      resp = await axiosGet('a=getstatus');
-    }
-
-    if (resp){
-      // let a: any = await makeStateFromKeys(cardStatus, resp?.data)
-      let a = resp?.data
-      let barData = [
-        {
-          kind: 'available ' + prettyBytes(a.ram_available, {minimumFractionDigits: 2}),
-          line: '',
-          // value: Number((100 - a.ram_percent).toFixed(2)),
-          value: a.ram_available,
-        },
-        {
-          kind: 'used ' + prettyBytes(a.ram_used, {minimumFractionDigits: 2}),
-          line: '',
-          // value: Number((a.ram_percent - a.ram_lootnika_percent).toFixed(2)),
-          value: a.ram_used
-        },
-        {
-          kind: 'lootnika ' + prettyBytes(a.ram_total * a.ram_lootnika_percent * 0.01, {minimumFractionDigits: 2}),
-          line: '',
-          // value: Number(a.ram_lootnika_percent.toFixed(2)),
-          value: a.ram_total/100 * a.ram_lootnika_percent
-        },
-      ]
-
-      barConfig.data = barData;    
-      let data = {
-        status: a.status,
-        uptime: a.uptime, 
-        cpu: a.cpu + ' %',
-        ram_total: prettyBytes(a.ram_total, {minimumFractionDigits: 2}),
-        ram_available: `${prettyBytes(a.ram_available, {minimumFractionDigits: 2})} (${(100 - a.ram_percent).toFixed(2)} %)`,
-        ram_used: `${prettyBytes(a.ram_used, {minimumFractionDigits: 2})} (${a.ram_percent.toFixed(2)} %)`,
-        ram_free: `${prettyBytes(a.ram_free, {minimumFractionDigits: 2})} (${(100 - a.ram_percent).toFixed(2)} %)`,
-        ram_lootnika: `${prettyBytes(a.ram_total/100 * a.ram_lootnika_percent)} (${a.ram_lootnika_percent.toFixed(2)} %)`
-      }
-      set_cardStatus(data)
-      refresh()
-      
-      if (cardStatusLoading){
-        set_cardStatusLoading(false)
-      }
-    }
-
-    getStatusPending[0] = false;
-  }
+    return done
+  }  
 
   async function updateTasks() {
     // console.log('updateTasks')
@@ -220,11 +96,11 @@ export default function Dashboard(props: Props) {
     let resp: Res
     if(demoMode){
       resp = await axiosGetFake(
-          'a=schedule?cmd=QueueInfo&limit=100',
+          'a=schedule?cmd=QueueInfo&limit=10',
           {status: 200, data: queueinfo}, 600
       );
     }else{
-        resp = await axiosGet('a=schedule?cmd=QueueInfo&limit=100');
+        resp = await axiosGet('a=schedule?cmd=QueueInfo&limit=10');
     }
 
     cardTasks[0] = []
@@ -262,35 +138,39 @@ export default function Dashboard(props: Props) {
     getTasksPending[0] = false;
   }
 
+
+  if (cardInfoLoading && !getInfoPending[0]){
+    updateInfo();
+  }
+  if (cardTasksLoading && !getTasksPending[0]){
+    updateTasks();
+  }
+
   useInterval(
     () => {
-      // console.log(cardTasks)
       if (cardInfoLoading && !getInfoPending[0]){
         updateInfo();
       }
 
       if (cardTasksLoading && !getTasksPending[0]){
-        console.log('updateTasks')
         updateTasks();
       }
 
-      updateStatus();
-    }, delay[0]
+      if (!cardInfoLoading && !cardTasksLoading){
+        isPlaying[0] = false
+      }
+    }, isPlaying[0] ? delay : null,
   );
 
-  if (!inited[0]){
-    delay[0] = 3000
-    inited[0] = true
-  }
 
   return (
     <>
     <Space align="start" size="middle" wrap>
       <Card title="Status" loading={cardStatusLoading} style={{minWidth: "30em", maxWidth: "60em"}}>
-      <span>RAM usage</span>
-      <Bar {...barConfig} />
+        <span>RAM usage</span>
+        <Bar {...statusBarConfig} />
         <List
-          dataSource={Object.entries(cardStatus)}
+          dataSource={tasksItems}
           renderItem={item => 
             <List.Item style={{display: "block"}}>
               <span className="simple-list-item" style={{width: "12em", display: "inline-block" }}>{item[0]}</span>
@@ -299,7 +179,7 @@ export default function Dashboard(props: Props) {
           }
         />
       </Card>
-      <Card title="Tasks reports" loading={cardTasksLoading} style={{minWidth: "30em", maxWidth: "60em"}}>
+      <Card title="Tasks problems" loading={cardTasksLoading} style={{minWidth: "30em", maxWidth: "60em"}}>
         <List
           dataSource={cardTasks[0]}
           renderItem={item => 
@@ -317,11 +197,11 @@ export default function Dashboard(props: Props) {
                   {}
                   <Space align="start" size="small" wrap style={{fontWeight: 600}}>
                     <Tooltip title="Task errors">
-                      <ExclamationCircleOutlined style={{color: item.color1, paddingRight: '0.2em'}} />
+                      <ExclamationCircleFilled style={{color: item.color1, paddingRight: '0.2em', fontSize: 'large'}} />
                       {item.task_error}
                     </Tooltip>
                     <Tooltip title="Export errors">
-                      <WarningOutlined style={{color: item.color2, paddingRight: '0.2em'}} />
+                      <WarningFilled style={{color: item.color2, paddingRight: '0.2em', fontSize: 'large'}} />
                       {item.export_error}
                     </Tooltip>
                   </Space>
@@ -352,7 +232,7 @@ export default function Dashboard(props: Props) {
           }
         />
       </Card>
-    </Space> 
+    </Space>
   </>
   );
 }

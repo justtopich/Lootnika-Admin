@@ -18,3 +18,7 @@ export function useInterval(callback: () => void, delay: number | null) {
       return () => clearInterval(id)
     }, [delay])
 }
+
+export function random_number(min: number, max: number){
+  return Math.floor(Math.random() * (max - min)) + min;
+}

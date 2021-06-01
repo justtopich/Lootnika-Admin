@@ -1,9 +1,13 @@
 import React, { useState, useContext } from 'react';
-import { AppContext } from '../../AppProvider';
 import { Link } from 'react-router-dom'
+import prettyBytes from 'pretty-bytes';
 import routes from '../../routes';
+import { AppContext } from '../../AppProvider';
+import { axiosGetFake, axiosGet, useInterval, random_number } from '../../utils/public';
+import { getstatus, } from '../../store/apiExamples';
+import { Res } from '../../config/index.type';
 import { Layout, Menu, Space, Divider, Button, Tooltip } from 'antd';
-import { githubPage, version } from '../../config/config'
+import { githubPage, version, demoMode } from '../../config/config'
 import { ReactComponent as Myico } from '../../assets/myico.svg';
 import { 
   DashboardFilled,
@@ -15,12 +19,93 @@ import {
   QuestionCircleOutlined
 } from '@ant-design/icons';
 
+
 const { Content, Sider, Header, Footer } = Layout;
 
 export default function BaseLayout() {
-
   const [collapsed, setСollapsed] = useState(false);
-  let { lastUpdate } = useContext(AppContext);
+  const [lastUpdate, set_lastUpdate] = useState(new Date().toLocaleTimeString());
+  const getStatusPending = useState([false])[0];
+  const delay = useState([200])[0];
+  const inited = useState([false])[0];
+
+  let { cardStatus, cardStatusLoading, statusBarConfig, set_cardStatusLoading } = useContext(AppContext);
+
+  async function updateStatus() {
+    if (getStatusPending[0]){
+      return
+    }
+
+    getStatusPending[0] = true;
+    let resp: Res
+    if(demoMode){
+      let dt = new Date()
+      let ramUse = random_number(3965752576, 4665752576)
+      let lotnikaRam = random_number(3,8)
+      getstatus.uptime = "24 day " + dt.getHours() + ":" + dt.getMinutes() + ":" + dt.getSeconds()
+      getstatus.cpu = random_number(15,88)
+      getstatus.ram_free = getstatus.ram_total - ramUse
+      getstatus.ram_available = getstatus.ram_free
+      getstatus.ram_used = ramUse
+      getstatus.ram_lootnika_percent = lotnikaRam
+      resp = await axiosGetFake('a=getstatus', {status: 200, data: getstatus}, 600);
+    }else{
+      resp = await axiosGet('a=getstatus');
+    }
+
+    if (resp){
+      let a = resp?.data
+      let lotnikaRam = a.ram_total * a.ram_lootnika_percent * 0.01
+      statusBarConfig.data = [
+        {
+          kind: 'free ' + prettyBytes(a.ram_free, {minimumFractionDigits: 2}),
+          line: '',
+          value: a.ram_free,
+        },
+        {
+          kind: 'used ' + prettyBytes(a.ram_used, {minimumFractionDigits: 2}),
+          line: '',
+          value: a.ram_used
+        },
+        {
+          kind: 'lootnika ' + prettyBytes(lotnikaRam, {minimumFractionDigits: 2}),
+          line: '',
+          value: lotnikaRam
+        },
+      ]
+
+      let data = {
+        status: a.status,
+        uptime: a.uptime, 
+        cpu: a.cpu + ' %',
+        ram_total: prettyBytes(a.ram_total, {minimumFractionDigits: 2}),
+        ram_available: `${prettyBytes(a.ram_available, {minimumFractionDigits: 2})} (${(100 - a.ram_percent).toFixed(2)} %)`,
+        ram_used: `${prettyBytes(a.ram_used, {minimumFractionDigits: 2})} (${a.ram_percent.toFixed(2)} %)`,
+        ram_free: `${prettyBytes(a.ram_free, {minimumFractionDigits: 2})} (${(100 - a.ram_percent).toFixed(2)} %)`,
+        ram_lootnika: `${prettyBytes(lotnikaRam)} (${a.ram_lootnika_percent.toFixed(2)} %)`
+      }
+      cardStatus[0] = data
+      set_lastUpdate(new Date().toLocaleTimeString())
+      
+      if (cardStatusLoading){
+        set_cardStatusLoading(false)
+      }
+    }
+
+    getStatusPending[0] = false;
+  }
+  
+
+  useInterval(
+    () => {
+      updateStatus();
+    }, delay[0]
+  );
+
+  if (!inited[0]){
+    delay[0] = 3000
+    inited[0] = true
+  }
 
     return (
       <>
@@ -54,8 +139,7 @@ export default function BaseLayout() {
             <div className="header-menu-item">
               <div className="header-menu-item-cnt">
                 <Tooltip placement="bottom" title="Open help page">
-                  <Link target={"_blank"} to="/help"><QuestionCircleOutlined /></Link>
-                  {/* <Link target={"_blank"} to="/lootnika/help/index.html"><QuestionCircleOutlined /></Link> */}
+                  <Link target={"_blank"} to={demoMode ? "/lootnika/help/index.html" : "/help"}><QuestionCircleOutlined /></Link>
                 </Tooltip>
               </div>
             </div>
