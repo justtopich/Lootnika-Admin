@@ -3,6 +3,7 @@ import axios from "axios";
 import { message } from "antd";
 import { Res } from '../config/index.type';
 
+
 axios.defaults.baseURL = API_URL;
 axios.defaults.withCredentials = false;
 

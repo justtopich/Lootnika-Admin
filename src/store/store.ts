@@ -1,5 +1,3 @@
-import { LooseObject } from '../config/index.type'
-
 export const statusBarConfig: any = {
     data: [{
       kind: 'Total',

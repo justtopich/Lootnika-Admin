@@ -1,4 +1,4 @@
-import { random_number } from '../utils/public'
+import { createFakeTask } from '../utils/public'
 
 
 export const getinfo = {
@@ -71,49 +71,19 @@ export const tasksinfo = {
 
 
 let ls = [];
-for (let i of Array(94) ){
-    let ttl = random_number(200, 999)
-    let task_error = 0
-    let export_error = 0
-
-    if(2 === random_number(0,4)){
-        export_error = random_number(0,40)
-    }
-
-    if(3 === random_number(0,5)){
-        task_error = random_number(0,20)
-    }
-    task_error += export_error
-
-    let newDoc = ttl - random_number(0,50)
-    let seen = ttl - task_error + export_error
-    let name = ['files_copy', 'example', 'user_topics'][random_number(0,3)]
-
-    ls.push(
-        {
-            "id": 537 - i,
-            "name": name,
-            "start_time": "05.05.2021 9:55:11",
-            "end_time": "05.05.2021 13:55:13",
-            "status": "complete",
-            "count_total": ttl,
-            "count_seen": seen,
-            "count_new": newDoc,
-            "count_differ": random_number(0,99),
-            "count_delete": random_number(0,99),
-            "count_task_error": task_error,
-            "count_export_error": export_error,
-            "last_doc_id": `${name.slice(0, 4)}_${random_number(653,345)}`
-        }
-    )
+for (let i of Array(97) ){
+    ls.push(createFakeTask('', ''))
 }
+
+let tomorrow =  new Date()
+tomorrow.setDate(new Date().getDate() + 1)
 
 export const queueinfo = {
     "status": "ok",
     "message": "returned 100 tasks",
     "scheduler_status": "ready",
-    "next_start_time": "2021-05-05 12:56:10",
-    "remained_cycles": 0,
+    "next_start_time": `${tomorrow.toISOString().split('T')[0]} ${tomorrow.toLocaleTimeString()}`,
+    "cycles_left": -1,
     "tasks": [
     {
     "id": 543,
@@ -132,7 +102,7 @@ export const queueinfo = {
     },
     {
     "id": 542,
-    "name": "user_topics",
+    "name": "files_copy",
     "start_time": "25.04.2021 12:55:11",
     "end_time": "25.04.2021 12:55:13",
     "status": "complete",
@@ -143,7 +113,7 @@ export const queueinfo = {
     "count_delete": 0,
     "count_task_error": 1,
     "count_export_error": 0,
-    "last_doc_id": "laval-sr_143"
+    "last_doc_id": "fi_143"
     },
     {
     "id": 541,
@@ -159,51 +129,6 @@ export const queueinfo = {
     "count_task_error": 1232,
     "count_export_error": 32,
     "last_doc_id": "laval-sr_87"
-    },
-    {
-    "id": 540,
-    "name": "example",
-    "start_time": "01.03.2021 12:16:02",
-    "end_time": "01.03.2021 12:16:03",
-    "status": "complete",
-    "count_total": 4880,
-    "count_seen": 4872,
-    "count_new": 50,
-    "count_differ": 41,
-    "count_delete": 0,
-    "count_task_error": 8,
-    "count_export_error": 0,
-    "last_doc_id": "ex_515"
-    },
-    {
-    "id": 539,
-    "name": "user_topics",
-    "start_time": "01.03.2021 12:15:59",
-    "end_time": "01.03.2021 12:16:00",
-    "status": "fail",
-    "count_total": -1,
-    "count_seen": 0,
-    "count_new": 0,
-    "count_differ": 0,
-    "count_delete": 0,
-    "count_task_error": 0,
-    "count_export_error": 0,
-    "last_doc_id": ""
-    },
-    {
-    "id": 537,
-    "name": "user_topics",
-    "start_time": "01.03.2021 12:11:41",
-    "end_time": "01.03.2021 12:11:43",
-    "status": "cancel ",
-    "count_total": 5433,
-    "count_seen": 123,
-    "count_new": 123,
-    "count_differ": 0,
-    "count_delete": 0,
-    "count_task_error": 0,
-    "count_export_error": 0,
-    "last_doc_id": "123"
-    },
+    }
    ].concat(ls)
 }

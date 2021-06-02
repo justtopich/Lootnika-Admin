@@ -107,16 +107,31 @@
   display: none;
 }
 .button-warn {
-  background-color: orange;
-  border-color: orange;
+  background-color: #ffb401;
+  border-color: #ffb401;
 }
 .button-warn:hover{
-  background-color:#ffcc6f;
-  border-color: #ffcc6f;
+  background-color:#ffc901;
+  border-color: #ffc901;
 }
 .button-warn:focus{
-  background: #ffcc6f;
-  border-color: #ffcc6f;
+  background: #ffc901;
+  border-color: #ffc901;
+}
+.button-success {
+  background-color: #52c41a;
+  border-color: #52c41a;
+  color: #fff
+}
+.button-success:hover{
+  background-color:#85d55e;
+  border-color: #85d55e;
+  color: #fff
+}
+.button-success:focus{
+  background: #85d55e;
+  border-color: #85d55e;
+  color: #fff
 }
 
 html {
