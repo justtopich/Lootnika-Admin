@@ -10,16 +10,7 @@ export const statusBarConfig: any = {
     isPercent: true,
     isStack: true,
     legend: true,
-    height: 72,
-    // color: ['#f7c122', '#9a67bd', '#657798'],
-    // label: {
-    //   position: 'end',
-
-    //   content: function content(item: LooseObject) {
-    //     return item.value.toFixed(2);
-    //   },
-    //   style: { fill: '#fff' },
-    // },
+    height: 80,
     animation: {
       appear: {
         animation: 'zoom-in',

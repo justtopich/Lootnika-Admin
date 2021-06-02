@@ -46,7 +46,6 @@ export function createFakeTask(name: string, startTime: string ){
 
   let start_time =  new Date()
   if(startTime === ''){
-    console.log('lolo')
     start_time.setDate(start_time.getDate() - random_number(12,33))
     start_time.setMinutes(start_time.getMinutes() - random_number(23,93))
   }

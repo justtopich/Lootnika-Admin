@@ -69,7 +69,6 @@ export const tasksinfo = {
     }
 }
 
-
 let ls = [];
 for (let i of Array(97) ){
     ls.push(createFakeTask('', ''))

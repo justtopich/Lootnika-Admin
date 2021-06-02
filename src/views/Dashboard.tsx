@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, Component } from "react";
 import { AppContext } from '../AppProvider';
 import { 
   Space,
@@ -10,12 +10,13 @@ import {
   Typography,
   Popover,
   Modal,
+  Select,
   Row, Col,
   Divider }
 from 'antd';
 import { axiosGetFake, axiosGet, useInterval, createFakeTask } from '../utils/public';
 import { Res, Props, LooseObject } from '../config/index.type';
-import { getinfo, queueinfo, stop } from '../store/apiExamples';
+import { getinfo, queueinfo, tasksinfo, stop } from '../store/apiExamples';
 import { demoMode } from '../config/config';
 import { Bar } from '@ant-design/charts';
 import {
@@ -26,12 +27,16 @@ import {
   StepForwardOutlined,
   CaretRightOutlined,
   ThunderboltOutlined,
-  PoweroffOutlined
+  PoweroffOutlined,
+  FileZipFilled,
+  DropboxOutlined,
   }
 from '@ant-design/icons';
+import { ButtonHTMLType } from "antd/lib/button/button";
 
 
 const { Title, Text } = Typography;
+const { Option } = Select;
 
 export default function Dashboard(props: Props) {
   let { cardStatusLoading, cardStatus, statusBarConfig } = useContext(AppContext);
@@ -41,11 +46,16 @@ export default function Dashboard(props: Props) {
   const isPlaying = useState([true])[0]
   const [cardInfoLoading, set_cardInfoLoading] = useState(true);
   const [cardScheduleLoading, set_cardScheduleLoading] = useState(true);
+  const [actualTasksLoading, set_actualTasksLoading] = useState(true);
   const [stopModalShow, set_stopModalShow] = useState(false);
 
   const getInfoPending = useState([false])[0];
   const getTasksPending = useState([false])[0];
+  const getActualTasksPending = useState([false])[0];
   
+  const actualTasks = useState([[{label: 'all', value: 'all'}]])[0]
+  const [actualTasksValue, set_actualTasksValue] = useState(actualTasks[0][0].value)
+
   const [cardInfo, set_cardInfo] = useState({
     product: '',
     picker_type: '',
@@ -80,6 +90,17 @@ export default function Dashboard(props: Props) {
       loading: false,
     }
   });
+  const selectTasksProps = {
+    style: { width: 200 },
+    value: actualTasksValue,
+    options: actualTasks[0],
+    onChange: (newValue: string) => {
+      set_actualTasksValue(newValue);
+    },
+    defaultValue: actualTasks[0][0].value,
+    loading: actualTasksLoading,
+  };
+
 
   async function makeStateFromKeys(stateObj: {}, obj: LooseObject) {
     let m:LooseObject = {};
@@ -90,8 +111,36 @@ export default function Dashboard(props: Props) {
     return m
   };
  
+  async function getActualTasks(): Promise<Boolean> {
+    console.log('getActualTasks')
+    let done = false;
+    if (getActualTasksPending[0]){
+      return false
+    }
+
+    getActualTasksPending[0] = true;
+    let resp: Res
+    if(demoMode){
+      resp = await axiosGetFake('a=schedule?cmd=TasksInfo', {status: 200, data: tasksinfo}, 1000);
+    }else{
+      resp = await axiosGet('a=schedule?cmd=TasksInfo');
+    }
+
+    if (resp){
+      let m = [{label: 'all', value: 'all'}]
+      Object.keys(resp?.data.tasks).forEach(k => {
+        m.push({label: k, value: k})
+      });
+      actualTasks[0] = m
+      set_actualTasksLoading(false)
+      done = true;
+      }
+    getActualTasksPending[0] = false;
+    return done
+  }  
+
   async function updateInfo(): Promise<Boolean> {
-    // console.log('updateInfo')
+    console.log('updateInfo')
     let done = false;
     if (getInfoPending[0]){
       return false
@@ -128,11 +177,11 @@ export default function Dashboard(props: Props) {
     let resp: Res
     if(demoMode){
       resp = await axiosGetFake(
-          'a=schedule?cmd=QueueInfo&limit=5',
+          'a=schedule?cmd=QueueInfo&limit=6',
           {status: 200, data: queueinfo}, 600
       );
     }else{
-        resp = await axiosGet('a=schedule?cmd=QueueInfo&limit=5');
+        resp = await axiosGet('a=schedule?cmd=QueueInfo&limit=6');
     }
 
     if(resp){
@@ -192,7 +241,7 @@ export default function Dashboard(props: Props) {
           type = "pause"
         }
         
-        console.log(`${canStop} ${active} ${type}`)
+        // console.log(`${canStop} ${active} ${type}`)
         set_controlsState({
           canStopSchedule: canStop,
           canEnableSchedule: controlsState.canEnableSchedule,
@@ -212,10 +261,14 @@ export default function Dashboard(props: Props) {
     getTasksPending[0] = false;
   }
 
+  function showSadSmile() {
+    return <div><p>Not working yet (ಥ﹏ಥ)</p></div>
+  }
+
   function enableSchedule(active: boolean){
     if(active){
       return(
-        <Popover content={() => {return <div><p>Not working yet (ಥ﹏ಥ)</p></div>}} title="Disable schedule" trigger="click">
+        <Popover content={showSadSmile()} title="Disable schedule" trigger="click">
           <Button 
           type="primary"
           disabled={!controlsState.startPause.active}
@@ -227,7 +280,7 @@ export default function Dashboard(props: Props) {
       )
     }else{
       return(
-        <Popover content={() => {return <div><p>Not working yet (ಥ﹏ಥ)</p></div>}} title="Disable schedule" trigger="click">
+        <Popover content={showSadSmile()} title="Disable schedule" trigger="click">
           <Button
           disabled={!controlsState.startPause.active}
           icon={<PoweroffOutlined />}
@@ -274,7 +327,7 @@ export default function Dashboard(props: Props) {
     await togleStopModal()
 }
 
-  async function scheduleAction(cmd: string) {
+  async function scheduleAction(cmd: string, taskName: string) {
     set_controlsState({
       canStopSchedule: false,
       canEnableSchedule: false,
@@ -285,59 +338,31 @@ export default function Dashboard(props: Props) {
         type: controlsState.startPause.type
       }
     })
-    
-    if(cmd === "Resume"){
-      let resp: Res
-      if(demoMode){
-        resp = await axiosGetFake(
-          'a=schedule?cmd=QueueInfo&limit=1',
-          {status: 200, data: {status: "ok", message: "returned 1 tasks", tasks: [{name: "user_topics"}]}},
-          1200
-        );
-      }else{
-        resp = await axiosGet('a=schedule?cmd=QueueInfo&limit=1');
-      }
 
-      if (resp){
-        if(resp.data.status === "ok"){
-          cmd = "Start&TaskName=" + resp.data.tasks[0].name
-        }else{
-          message.error("Error: " + resp.data.message);
-        }
-      }else{
-        message.error("Fail to execute command");
-      }
+    let taskNameCmd: string
+    if(taskName === 'all'){
+      taskNameCmd = ''
+    }else{
+      taskNameCmd = '&TaskName=' + taskName
     }
-    
+
     let resp: Res
     if(demoMode){
-      resp = await axiosGetFake('a=schedule?cmd=' + cmd, {status: 200, data: {status: "ok", message: ""}}, 800);
       let status = "pause"
-
-      if(cmd === "Start&TaskName=user_topics"){
-        resp = await axiosGetFake(
-          'a=schedule?cmd=QueueInfo&limit=1',
-          {status: 200, data: {status: "ok", message: "continue task user_topics"}},
-          600
-        );
+      let message = 'successfully paused task ' + taskName
+      if(cmd === 'start'){
+        queueinfo.tasks.unshift(createFakeTask(taskName, 'now'))
+        message = 'successfully started task ' + taskName
         status = "work"
-      
-      }else if(cmd === 'Start'){
-        resp = await axiosGetFake(
-          'a=Start',
-          {status: 200, data: {status: "ok", message: "begin all tasks"}},
-          600
-        );
-        queueinfo.tasks.unshift(createFakeTask('user_topics', 'now'))
-        status = "work"
-      
-      }else if(cmd === 'Cancel'){
+      }else if(cmd === 'cancel'){
         status = "ready"
+        message = 'successfully canceled task ' + taskName
       }
+
+      resp = await axiosGetFake('a=schedule?cmd=' + cmd, {status: 200, data: {status: "ok", message: message}}, 800);
       queueinfo.scheduler_status = status
-    
     }else{
-      resp = await axiosGet('a=schedule?cmd=' + cmd);
+      resp = await axiosGet(`a=schedule?cmd=${cmd}${taskNameCmd}`);
     }
 
     if (resp){
@@ -349,6 +374,7 @@ export default function Dashboard(props: Props) {
     }else{
       message.error("Fail to execute command");
     }
+
   }
 
   function pauseButton(type: string) {
@@ -360,7 +386,7 @@ export default function Dashboard(props: Props) {
         loading={controlsState.startPause.loading}
         disabled={!controlsState.startPause.active}
         icon={<PauseOutlined />}
-        onClick={() => scheduleAction("Pause")}>
+        onClick={() => scheduleAction("pause", actualTasksValue)}>
         Pause
         </Button>,
       "start": 
@@ -369,7 +395,7 @@ export default function Dashboard(props: Props) {
         disabled={!controlsState.startPause.active}
         icon={<StepForwardOutlined />}
         className="button-success"
-        onClick={() => scheduleAction("Start")}>
+        onClick={() => scheduleAction("start", actualTasksValue)}>
         Run once
         </Button>,
       "resume": 
@@ -378,7 +404,7 @@ export default function Dashboard(props: Props) {
         disabled={!controlsState.startPause.active}
         className="button-success"
         icon={<CaretRightOutlined />}
-        onClick={() => scheduleAction("Resume")}>
+        onClick={() => scheduleAction("start", actualTasksValue)}>
         Resume
         </Button>,
     }
@@ -402,6 +428,10 @@ export default function Dashboard(props: Props) {
         updateTasks();
       }
 
+      if(actualTasksLoading){
+        getActualTasks()
+      }
+
       if (!cardInfoLoading && !cardScheduleLoading){
         isPlaying[0] = false
       }
@@ -413,6 +443,39 @@ export default function Dashboard(props: Props) {
       updateTasks()
     }, 3000
   )
+
+  // actualTasks.forEach(i => console.log(i))
+
+  const controlButtons: Array<Object> = [
+    <Popover content={showSadSmile()} title="Disable schedule" trigger="click">
+      <Button
+      type="primary"
+      icon={<FileZipFilled />}
+      loading={controlsState.startPause.loading}
+      disabled={!controlsState.startPause.active}
+      onClick={() => showSadSmile()}>
+      Backup
+      </Button>
+    </Popover>,
+    <Popover content={showSadSmile()} title="Disable schedule" trigger="click">
+      <Button
+      type="primary"
+      icon={<DropboxOutlined />}
+      className="button-warn"
+      loading={controlsState.startPause.loading}
+      disabled={!controlsState.startPause.active}
+      onClick={() => showSadSmile()}>
+      Restore
+      </Button>
+    </Popover>,
+    <Button 
+      danger type="primary"
+      icon={<PoweroffOutlined />}
+      disabled={!controlsState.canStopLootnika}
+      onClick={() => togleStopModal()}>
+        Stop lootnika
+    </Button>
+  ]
 
   return (
     <>
@@ -447,7 +510,10 @@ export default function Dashboard(props: Props) {
         <Divider orientation="left" plain>Control</Divider>
         <Row justify="space-around" style={{textAlign: 'center' }}>
           <Col span={6}>
-            {enableSchedule(controlsState.canEnableSchedule)}
+            {/* <Select defaultValue={actualTasks[0]} style={{ width: 200 }}> */}
+              {/* {() => actualTasks.forEach(i => <Option value={i}>{i}</Option>)} */}
+            {/* </Select> */}
+            <Select {...selectTasksProps} />
           </Col>
           <Col span={6}>
             {pauseButton(controlsState.startPause.type)}
@@ -457,17 +523,12 @@ export default function Dashboard(props: Props) {
               type="primary"
               disabled={!controlsState.canStopSchedule}
               icon={<BorderOutlined />}
-              onClick={() => scheduleAction("Cancel")}>
+              onClick={() => scheduleAction("cancel", actualTasksValue)}>
               Cancel task
             </Button>
           </Col>
           <Col span={6}>
-            <Button 
-              danger type="primary"
-              disabled={!controlsState.canStopLootnika}
-              icon={<PoweroffOutlined />} onClick={() => togleStopModal()}>
-                Stop lootnika
-            </Button>
+            {enableSchedule(controlsState.canEnableSchedule)}
           </Col>
         </Row>
         <Divider orientation="left" plain>Last tasks</Divider>
@@ -515,6 +576,16 @@ export default function Dashboard(props: Props) {
             <List.Item style={{display: "block"}}>
               <span className="simple-list-item" style={{width: "10em", display: "inline-block" }}>{item[0]}</span>
               <span className="simple-list-item" style={{display: "inline-block" }}>{item[1]}</span>
+            </List.Item>
+          }
+        />
+      </Card>
+      <Card title="Control" loading={cardInfoLoading} style={{minWidth: "30em", maxWidth: "60em"}}>
+        <List
+          dataSource={controlButtons}
+          renderItem={item => 
+            <List.Item style={{display: "block"}}>
+              { item }
             </List.Item>
           }
         />
