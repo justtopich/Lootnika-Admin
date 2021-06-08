@@ -10,12 +10,13 @@ import { Layout, Menu, Space, Divider, Button, Tooltip } from 'antd';
 import { githubPage, version, demoMode } from '../../config/config'
 import { ReactComponent as Myico } from '../../assets/myico.svg';
 import { 
-  DashboardFilled,
-  InfoCircleOutlined,
-  UnorderedListOutlined,
+  HomeFilled,
+  ScheduleFilled,
+  ReadFilled,
   GithubFilled,
   MenuUnfoldOutlined,
   MenuFoldOutlined,
+  InfoCircleFilled,
   QuestionCircleOutlined
 } from '@ant-design/icons';
 
@@ -123,9 +124,10 @@ export default function BaseLayout() {
             style={{ borderRight: 0, backgroundColor: "#3f4d67" }}
             theme="dark"
             >
-              <Menu.Item key="1" icon={<DashboardFilled />}><Link to="/admin">Dashboard</Link></Menu.Item>
-              <Menu.Item key="2" icon={<UnorderedListOutlined />}><Link to="/admin/tasksjournal">Tasks journal</Link></Menu.Item>
-              <Menu.Item key="3" icon={<InfoCircleOutlined />}><Link to="/admin/about">About</Link></Menu.Item>
+              <Menu.Item key="1" icon={<HomeFilled />}><Link to="/admin">Dashboard</Link></Menu.Item>
+              <Menu.Item key="2" icon={<ScheduleFilled />}><Link to="/admin/tasksjournal">Tasks journal</Link></Menu.Item>
+              <Menu.Item key="3" icon={<ReadFilled />}><Link to="/admin/logging">Logs</Link></Menu.Item>
+              <Menu.Item key="4" icon={<InfoCircleFilled />}><Link to="/admin/about">About</Link></Menu.Item>
           </Menu>
         </Sider>
         <Layout>

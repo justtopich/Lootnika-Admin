@@ -5,10 +5,11 @@ import Loading from "../components/Loading";
 import { Redirect } from "react-router-dom";
 
 
-const [NotFound, Dashboard, TasksJournal, About] = [
+const [NotFound, Dashboard, TasksJournal, Logging, About] = [
     () => import(`../views/NotFound`),
     () => import(`../views/Dashboard`),
     () => import(`../views/TasksJournal`),
+    () => import(`../views/Logging`),
     () => import(`../views/About`),
   ].map((item) => {
     return loadable(item as any, {
@@ -22,8 +23,9 @@ const [NotFound, Dashboard, TasksJournal, About] = [
             <CacheRoute exact path="/"  ><Redirect to="/admin" /></CacheRoute>
             <CacheRoute exact path="/admin/index.html" component={Dashboard} />
             <CacheRoute exact path="/admin" component={Dashboard} />
-            <CacheRoute exact path="/admin/about" component={About} />
             <CacheRoute exact path="/admin/tasksjournal" component={TasksJournal} />
+            <CacheRoute exact path="/admin/logging" component={Logging} />
+            <CacheRoute exact path="/admin/about" component={About} />
             <CacheRoute component={NotFound} />
         </CacheSwitch>
     );

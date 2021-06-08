@@ -1,4 +1,4 @@
-import React, { useState, useContext, Component } from "react";
+import React, { useState, useContext } from "react";
 import { AppContext } from '../AppProvider';
 import { 
   Space,
@@ -32,11 +32,10 @@ import {
   DropboxOutlined,
   }
 from '@ant-design/icons';
-import { ButtonHTMLType } from "antd/lib/button/button";
+import { exception } from "node:console";
 
 
 const { Title, Text } = Typography;
-const { Option } = Select;
 
 export default function Dashboard(props: Props) {
   let { cardStatusLoading, cardStatus, statusBarConfig } = useContext(AppContext);
@@ -111,7 +110,7 @@ export default function Dashboard(props: Props) {
     return m
   };
  
-  async function getActualTasks(): Promise<Boolean> {
+  async function getActualTasks(): Promise<boolean> {
     console.log('getActualTasks')
     let done = false;
     if (getActualTasksPending[0]){
@@ -137,9 +136,9 @@ export default function Dashboard(props: Props) {
       }
     getActualTasksPending[0] = false;
     return done
-  }  
+  }
 
-  async function updateInfo(): Promise<Boolean> {
+  async function updateInfo(): Promise<boolean> {
     console.log('updateInfo')
     let done = false;
     if (getInfoPending[0]){
@@ -351,9 +350,18 @@ export default function Dashboard(props: Props) {
       let status = "pause"
       let message = 'successfully paused task ' + taskName
       if(cmd === 'start'){
-        queueinfo.tasks.unshift(createFakeTask(taskName, 'now'))
-        message = 'successfully started task ' + taskName
-        status = "work"
+        if(queueinfo.scheduler_status === 'pause'){
+          if(queueinfo.tasks[0].name === taskName){
+            message = 'successfully resume task ' + taskName
+            status = "work"
+          }else{
+            message = `Scheduler suspended on task ${queueinfo.tasks[0].name}, but you trying to resume another task, that not allowed`
+          }
+        }else{
+          queueinfo.tasks.unshift(createFakeTask(taskName, 'now'))
+          message = 'successfully started task ' + taskName
+          status = "work"
+        }
       }else if(cmd === 'cancel'){
         status = "ready"
         message = 'successfully canceled task ' + taskName

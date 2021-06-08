@@ -30,6 +30,9 @@
 .header-menu-item-cnt > a:hover {
   color:#1890ff;
 }
+.ant-menu-item-icon{
+  font-size: large !important;
+}
 #components-layout-demo-custom-trigger {
   padding-right: 1em;
   font-size: large;
@@ -94,7 +97,11 @@
 }
 /* .ant-card-head-title { */
   /* padding: .5rem 0; */
-/* } */
+  /* } */
+
+.ant-tabs-tab-active{
+  border-bottom-color: #1890ff !important;
+}
 .simple-list-item {
   -ms-flex-negative: 0;
   flex-shrink: 0;
@@ -103,6 +110,14 @@
   /* white-space: nowrap; */
   word-wrap: break-word;
 }
+.log-list-item {
+  font-size: small;
+  line-height: 1em;
+  font-family: monospace;
+  border-bottom: 1px dashed #D7DBE4 !important;
+  padding: .5em;
+}
+
 .ant-table-wrapper::before{
   display: none;
 }

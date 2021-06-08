@@ -18,3 +18,20 @@ export type Res =
 export interface LooseObject {
     [key: string]: any
 }
+
+export interface ILogRecod {
+  key: string,
+  title: string,
+  content: JSX.Element,
+  init: boolean,
+  end: number,
+  offsetStart: number,
+  offsetEnd: number,
+  loading: boolean,
+  hasMore: boolean,
+  records: string[] | []
+}
+
+export interface ILogRecods {
+  [key: string]: ILogRecod
+}

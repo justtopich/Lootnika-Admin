@@ -23,10 +23,12 @@ export default function About(props: Props) {
     "pretty-bytes": "^5.6.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
+    "react-infinite-scroll-component": "^6.1.0",
     "react-router-cache-route": "^1.11.0",
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.3",
     "react-use": "^17.2.4",
+    "types": "^0.1.1",
     "typescript": "^4.1.2",
     "web-vitals": "^1.0.1"
   }
